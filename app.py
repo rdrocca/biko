@@ -6,12 +6,11 @@ app = Flask(__name__)
 
 # Facebook Messenger Configuration
 recipient_id = None
-VTK = 'pythonchatbot'
-PAT = 'EAAFZBS4wgWGgBANDGc9HnHsRSfLL0DfjOeVQOZCZBZCUyp8CMmGDDOVIMNDdxktZAHwThPe0aUVZCTAvZA8vkXObQ8RRsGAuYe9Z' \
-      'Bk6rPfPfSgmfOuuZBwWqTkFXUdi6ZAsSSZAN4jYTjBtaquMMz1qSX4ZBtbBrctZAGrKb0udaMnNfE5b0nkQCQk1plLEZCyYFOI76wZD'
+VTK = ''
+PAT = ''
 
 # Dialogflow Configuration
-CAT = 'cb389d580e4a485d96bb99e753d77919'
+CAT = ''
 
 # images
 IMG_URL = 'https://i.giphy.com/xT0GqrJNbZkRcr2Jgc.gif'
