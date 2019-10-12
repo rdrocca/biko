@@ -1,16 +1,19 @@
 import apiai
 import json
-from flask import Flask, request, render_template
 import requests
+from msg import *
+from flask import Flask, request, render_template
+
 app = Flask(__name__)
 
 # Facebook Messenger Configuration
 recipient_id = None
-VTK = ''
-PAT = ''
+VTK = 'pythonchatbot'
+PAT = 'EAAFZBS4wgWGgBAOId4696jh6b3kUgWLP4ozGKfBPH7mVDFpIY9ujY2GGs0NgCXWc9cZBIEE2LPLOwtplH5XNldzeFQ4z1DGMc2MxZCqKDa' \
+      '2fY0tPZCun0CbApKXK4o5i8w6d2VM58IMytyg4vgAineLBNcyQaDElZAAAvxyN4Mz92wXy4fjp7Ey0mW5ZBq4r0ZD'
 
 # Dialogflow Configuration
-CAT = ''
+CAT = 'a7adb35ce07a4701af7f2383808622da'
 
 # images
 IMG_URL = 'https://i.giphy.com/xT0GqrJNbZkRcr2Jgc.gif'
@@ -59,63 +62,34 @@ def webhook():
                     if "text" in messaging_event["message"]:
                         message_text = messaging_event["message"]["text"]
                         response = nlp_fallback(message_text, sender_id)
-                        send_message(sender_id, str(response))
+                        send_message(sender_id, str(response), PAT)
                     if "attachments" in messaging_event["message"]:  # contains an image, location or other
                         attachment = messaging_event["message"]["attachments"][0]
                         if attachment['type'] == 'image':
                             message_image = attachment["payload"]["url"]
-                            send_image_url_message(recipient_id, IMG_URL)
+                            send_location_message(sender_id, "Please let me know where can we pick the bike up", PAT)
     return "ok", 200
 
 
-def send_message(recipient_id, message_text):
-    params = {
-        "access_token": PAT
-    }
-    headers = {
-        "Content-Type": "application/json"
-    }
-    data = json.dumps({
-        "recipient": {
-            "id": recipient_id
-        },
-        "message": {
-            "text": message_text
-        }
-    })
-    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
-    if r.status_code != 200:
-        print(r.status_code)
-        print(r.text)
-
-
-def send_image_url_message(recipient_id, image):
-
-    params = {
-        "access_token": PAT
-    }
-    headers = {
-        "Content-Type": "application/json"
-    }
-    data = json.dumps({
-        "recipient": {
-            "id": recipient_id
-        },
-        "message": {
-            "attachment": {
-                "type": "image",
-                "payload": {
-                    "url": image,
-                    "is_reusable": True
-                }
-            }
-        }
-    })
-    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
-    if r.status_code != 200:
-        print(r.status_code)
-        print(r.text)
-
+# def send_message(recipient_id, message_text):
+#     params = {
+#         "access_token": PAT
+#     }
+#     headers = {
+#         "Content-Type": "application/json"
+#     }
+#     data = json.dumps({
+#         "recipient": {
+#             "id": recipient_id
+#         },
+#         "message": {
+#             "text": message_text
+#         }
+#     })
+#     r = requests.post("https://graph.facebook.com/v4.0/me/messages", params=params, headers=headers, data=data)
+#     if r.status_code != 200:
+#         print(r.status_code)
+#         print(r.text)
 
 if __name__ == '__main__':
     app.run(debug = True, port=5500)
