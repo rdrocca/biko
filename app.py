@@ -2,23 +2,26 @@ import apiai
 import json
 import requests
 from msg import *
+from dbconn import *
 from flask import Flask, request, render_template
 
 app = Flask(__name__)
+dbcnn = Dbconn()
 
 # Facebook Messenger Configuration
 recipient_id = None
 VTK = 'pythonchatbot'
-PAT = 'EAAFZBS4wgWGgBAOId4696jh6b3kUgWLP4ozGKfBPH7mVDFpIY9ujY2GGs0NgCXWc9cZBIEE2LPLOwtplH5XNldzeFQ4z1DGMc2MxZCqKDa' \
-      '2fY0tPZCun0CbApKXK4o5i8w6d2VM58IMytyg4vgAineLBNcyQaDElZAAAvxyN4Mz92wXy4fjp7Ey0mW5ZBq4r0ZD'
+PAT = 'EAAFZBS4wgWGgBABIgGOhgDZCOutmQ3IiW20ZCmIjZAjuDt3Plx7m25IV6eBvF7I5ZCflBfVUwMFx1159ozAfPVttzkdLVssv2Q5e0G7Oz' \
+      'JZBpOcHm2pT8fZCeNRuYUVNJfIOBtYEROvoFp01Cs4qZBkbCLH1AkOq6Nkp0Dg6GpnErjGWXuwrMPFxKWWpwu07pn0ZD'
 
 # Dialogflow Configuration
-CAT = 'a7adb35ce07a4701af7f2383808622da'
+CAT = '75c7bbc3585c494399b7be229c76bbab'
 
 # images
 IMG_URL = 'https://i.giphy.com/xT0GqrJNbZkRcr2Jgc.gif'
 
 def nlp_fallback(input_text, session_id):
+    dbwrite = False
     ai = apiai.ApiAI(CAT)
     req = ai.text_request()
     req.lang = 'en'  # 'sp' para español
@@ -27,6 +30,12 @@ def nlp_fallback(input_text, session_id):
     response = req.getresponse()
     raw = json.loads(response.read())
     if raw['status']['code'] == 200:
+        booking = raw['result']['parameters']
+        if booking['BicyleType'] is not None and booking['date'] is not None and booking['time'] is not None:
+            customer_id = session_id
+            dbres = dbcnn.add_booking([customer_id, booking])
+            if not dbres:
+                raise Exception('Mlab Exception:' + 'Error de escritura en base de datos')
         response_text = raw['result']['fulfillment']['messages'][0]['speech']
     else:
         raise Exception('Dialogflow Exception:' + raw['status']['errorType'])
@@ -61,6 +70,8 @@ def webhook():
                 if messaging_event.get("message"):  # someone sent us a message
                     if "text" in messaging_event["message"]:
                         message_text = messaging_event["message"]["text"]
+                        if message_text == "quick":
+                            send_quick_reply(sender_id, PAT)
                         response = nlp_fallback(message_text, sender_id)
                         send_message(sender_id, str(response), PAT)
                     if "attachments" in messaging_event["message"]:  # contains an image, location or other
@@ -92,4 +103,10 @@ def webhook():
 #         print(r.text)
 
 if __name__ == '__main__':
+    parameters = {
+        "BicyleType": "Mountain1",
+        "date": "2019-10-21",
+        "time": "10:00:00"
+      }
+    dbres = dbcnn.add_booking([2, parameters])
     app.run(debug = True, port=5500)
