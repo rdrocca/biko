@@ -4,9 +4,9 @@ from pymongo import MongoClient
 
 class Dbconn:
     def __init__(self):
-        self.dbuser = "admin"
-        self.dbpass = "bikoadmin1"
-        self.dbnode = 'ds040017.mlab.com:40017/bikodb'
+        self.dbuser = "****"
+        self.dbpass = "****"
+        self.dbnode = 'ds000000.mlab.com:40017/bikodb'
         self.db = None
         self.connection = None
         self.connect()

@@ -108,5 +108,5 @@ if __name__ == '__main__':
         "date": "2019-10-21",
         "time": "10:00:00"
       }
-    dbres = dbcnn.add_booking([2, parameters])
+    # dbres = dbcnn.add_booking([2, parameters])
     app.run(debug = True, port=5500)
